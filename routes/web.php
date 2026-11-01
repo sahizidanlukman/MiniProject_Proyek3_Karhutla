@@ -1,18 +1,27 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FireReportController;
 use Illuminate\Support\Facades\Route;
 
-// Akses utama langsung diarahkan ke halaman login
+// Akses utama diarahkan ke daftar laporan
 Route::get('/', function () {
-    return redirect()->route('login');
+    return redirect()->route('reports.index');
 });
 
-// Rute untuk pengguna yang belum login 
+// Route Guest (Login)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 });
 
-// Rute logout untuk pengguna yang sudah login
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+// Route Terautentikasi (Sudah Login)
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Rute Laporan
+    Route::get('/reports', [FireReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/create', [FireReportController::class, 'create'])->name('reports.create');
+    Route::post('/reports', [FireReportController::class, 'store'])->name('reports.store');
+    Route::get('/reports/{report}', [FireReportController::class, 'show'])->name('reports.show');
+});

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SiKarhutla - Pelaporan & Pemantauan Kebakaran Hutan dan Lahan</title>
+    <title>Karhutla.app - Pelaporan & Pemantauan Kebakaran Hutan dan Lahan</title>
     <style>
         * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
         body { margin: 0; background: #f4f6f8; color: #1e293b; }
@@ -34,7 +34,7 @@
 <body>
     <nav>
         <div>
-            <strong>SiKarhutla Komunitas</strong>
+            <strong>Karhutla.app</strong>
             @auth
                 <a href="{{ route('reports.index') }}" style="margin-left: 20px;">Daftar Laporan</a>
                 @if(auth()->user()->role === 'pelapor')

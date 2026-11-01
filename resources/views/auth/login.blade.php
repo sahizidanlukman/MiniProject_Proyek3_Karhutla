@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="card" style="max-width: 420px; margin: 40px auto;">
-    <h2 style="margin-top: 0;">Login SiKarhutla</h2>
+    <h2 style="margin-top: 0;">Login Karhutla.app</h2>
     <p style="color: #475569; font-size: 14px;">Silakan masuk untuk melaporkan atau memantau indikasi kebakaran hutan dan lahan.</p>
 
     <form action="{{ route('login.post') }}" method="POST">
