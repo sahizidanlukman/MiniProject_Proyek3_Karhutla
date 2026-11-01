@@ -66,4 +66,58 @@
         <a href="{{ route('reports.index') }}" class="btn btn-secondary">Batal</a>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const areaSelect = document.getElementById('area_id');
+    const infoBox = document.getElementById('area-async-info');
+
+    async function fetchAreaSummary(areaId) {
+        if (!areaId) {
+            infoBox.style.display = 'none';
+            infoBox.innerHTML = '';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/areas/${areaId}/summary`, {
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (!response.ok) throw new Error('Gagal memuat informasi area');
+            const data = await response.json();
+
+            let recentList = '';
+            if (data.recent_active_reports.length > 0) {
+                recentList = '<ul style="margin: 6px 0 0 18px; padding: 0;">' +
+                    data.recent_active_reports.map(r =>
+                        `<li>${r.title} — Kondisi: <strong>${r.severity}</strong> (${r.status})</li>`
+                    ).join('') +
+                    '</ul>';
+            } else {
+                recentList = '<div style="margin-top:4px; color:#475569;">Belum ada laporan aktif di area ini.</div>';
+            }
+
+            infoBox.style.display = 'block';
+            infoBox.innerHTML = `
+                <strong>Informasi Wilayah (${data.name} - ${data.district}):</strong><br>
+                Tingkat Kerawanan: <strong>${data.risk_level}</strong> | Instansi Terkait: <strong>${data.contact_agency}</strong><br>
+                Jumlah Laporan Aktif Saat Ini: <strong>${data.active_reports_count} laporan</strong>
+                ${recentList}
+            `;
+        } catch (err) {
+            infoBox.style.display = 'block';
+            infoBox.innerHTML = 'Tidak dapat memuat informasi wilayah.';
+        }
+    }
+
+    areaSelect.addEventListener('change', function () {
+        fetchAreaSummary(this.value);
+    });
+
+    if (areaSelect.value) {
+        fetchAreaSummary(areaSelect.value);
+    }
+});
+</script>
 @endsection
