@@ -50,32 +50,32 @@ class DatabaseSeeder extends Seeder
 
         // 2. Data Master Area / Wilayah untuk Dropdown
         Area::firstOrCreate(
-            ['name' => 'Kawasan Perkebunan Gambut Blok Timur'],
+            ['name' => 'Hutan Kalimantan Tengah'],
             [
-                'district' => 'Kec. Rasau Jaya, Kab. Kubu Raya',
+                'district' => 'Kota Palangka Raya',
                 'risk_level' => 'tinggi',
-                'contact_agency' => 'BPBD Kubu Raya & Manggala Agni Daops Pontianak',
-                'description' => 'Lahan gambut dalam di sekitar perkebunan warga.',
+                'contact_agency' => 'BPBD Kalimantan Tengah',
+                'description' => 'Wilayah dengan lahan gambut luas.',
             ]
         );
 
         Area::firstOrCreate(
-            ['name' => 'Lahan Semak Belukar Sungai Ambawang'],
+            ['name' => 'HutanKalimantan Barat'],
             [
-                'district' => 'Kec. Sungai Ambawang, Kab. Kubu Raya',
+                'district' => 'Kab. Kubu Raya',
                 'risk_level' => 'sedang',
-                'contact_agency' => 'Damkar Sungai Ambawang & Pemerintah Desa',
-                'description' => 'Kawasan semak kering dekat jalan lintas provinsi.',
+                'contact_agency' => 'BPBD Kalimantan Barat & Manggala Agni',
+                'description' => 'Wilayah perkebunan dan lahan semak.',
             ]
         );
 
         Area::firstOrCreate(
-            ['name' => 'Hutan Sekunder Penyangga Bukit Sebelah'],
+            ['name' => 'Hutan Kalimantan Selatan'],
             [
-                'district' => 'Kec. Mandor, Kab. Landak',
+                'district' => 'Kab. Banjar',
                 'risk_level' => 'rendah',
-                'contact_agency' => 'KPH Wilayah Landak & BPBD Landak',
-                'description' => 'Area perbukitan dan kebun karet masyarakat.',
+                'contact_agency' => 'BPBD Kalimantan Selatan',
+                'description' => 'Wilayah lahan kering di sekitar permukiman.',
             ]
         );
     }

@@ -21,6 +21,9 @@ Route::middleware('auth')->group(function () {
 
     // Endpoint Asynchronous fetch() informasi wilayah 
     Route::get('/areas/{area}/summary', [AreaController::class, 'summary'])->name('areas.summary');
+    Route::get('/reports/recap', [FireReportController::class, 'recap'])
+        ->middleware('role:relawan,koordinator')
+        ->name('reports.recap');
 
     // Fitur buat & edit laporan khusus Pelapor (AC-02, AC-05, AC-07)
     Route::middleware('role:pelapor')->group(function () {

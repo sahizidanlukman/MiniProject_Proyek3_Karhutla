@@ -260,4 +260,44 @@ class FireReportController extends Controller
         return back();
     }
 
+        public function recap(Request $request)
+    {
+        $severityFilter = $request->input('severity');
+
+        $baseQuery = FireReport::query();
+        if (! empty($severityFilter)) {
+            $baseQuery->where('severity', $severityFilter);
+        }
+
+        $totalReports = (clone $baseQuery)->count();
+        $activeReports = (clone $baseQuery)->whereIn('status', ['menunggu_tinjauan', 'ditinjau', 'diteruskan'])->count();
+        $completedReports = (clone $baseQuery)->where('status', 'selesai')->count();
+
+        $areaRecaps = Area::withCount([
+            'fireReports as total_count' => function ($q) use ($severityFilter) {
+                if ($severityFilter) $q->where('severity', $severityFilter);
+            },
+            'fireReports as active_count' => function ($q) use ($severityFilter) {
+                $q->whereIn('status', ['menunggu_tinjauan', 'ditinjau', 'diteruskan']);
+                if ($severityFilter) $q->where('severity', $severityFilter);
+            },
+            'fireReports as forwarded_count' => function ($q) use ($severityFilter) {
+                $q->where('status', 'diteruskan');
+                if ($severityFilter) $q->where('severity', $severityFilter);
+            },
+            'fireReports as completed_count' => function ($q) use ($severityFilter) {
+                $q->where('status', 'selesai');
+                if ($severityFilter) $q->where('severity', $severityFilter);
+            },
+        ])->orderBy('name')->get();
+
+        return view('reports.recap', compact(
+            'totalReports',
+            'activeReports',
+            'completedReports',
+            'areaRecaps',
+            'severityFilter'
+        ));
+    }
+
 }
