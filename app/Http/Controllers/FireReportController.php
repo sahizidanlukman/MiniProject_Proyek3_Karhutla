@@ -152,4 +152,93 @@ class FireReportController extends Controller
         return redirect()->route('reports.show', $report)
             ->with('success', 'Laporan berhasil diperbarui.');
     }
+    /**
+     * Peninjauan laporan oleh Relawan Pemantau (AC-06, AC-07, BR-03).
+     */
+    public function review(Request $request, FireReport $report)
+    {
+        // BR-03: Laporan yang sudah selesai atau ditolak tidak dapat diubah lagi
+        if (in_array($report->status, ['selesai', 'ditolak'], true)) {
+            return back()->withErrors([
+                'business_rule' => 'BR-03: Laporan sudah berstatus final (' . $report->status . ') dan tidak dapat ditinjau ulang.',
+            ]);
+        }
+
+        // Hanya laporan berstatus menunggu_tinjauan atau ditinjau yang dapat diperbarui tinjauannya
+        if (! in_array($report->status, ['menunggu_tinjauan', 'ditinjau'], true)) {
+            return back()->withErrors([
+                'business_rule' => 'Alur Status: Laporan yang sudah diteruskan ke pihak terkait tidak dapat dikembalikan ke tahap tinjauan awal.',
+            ]);
+        }
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:ditinjau,ditolak'],
+            'review_notes' => ['required', 'string', 'min:10'],
+            'needs_forwarding' => ['nullable', 'boolean'],
+        ]);
+
+        $report->update([
+            'status' => $validated['status'],
+            'reviewed_by' => Auth::id(),
+            'review_notes' => $validated['review_notes'],
+            'needs_forwarding' => $request->boolean('needs_forwarding'),
+        ]);
+
+        return redirect()->route('reports.show', $report)
+            ->with('success', 'Hasil peninjauan laporan berhasil disimpan.');
+    }
+    /**
+     * Pencatatan penerusan informasi & penyelesaian oleh Koordinator Relawan (AC-06, AC-07, BR-02, BR-03).
+     */
+    public function coordinate(Request $request, FireReport $report)
+    {
+        // BR-03: Laporan yang sudah selesai atau ditolak tidak dapat diubah lagi
+        if (in_array($report->status, ['selesai', 'ditolak'], true)) {
+            return back()->withErrors([
+                'business_rule' => 'BR-03: Laporan sudah berstatus final (' . $report->status . ') dan tidak dapat diubah lagi.',
+            ]);
+        }
+
+        $validated = $request->validate([
+            'status' => ['required', 'in:diteruskan,selesai'],
+            'forwarded_to' => ['required_if:status,diteruskan', 'nullable', 'string', 'max:150'],
+        ]);
+
+        // BR-02: Laporan hanya dapat diteruskan ke pihak terkait jika sudah ditinjau oleh Relawan Pemantau
+        if ($validated['status'] === 'diteruskan') {
+            if ($report->status !== 'ditinjau' || empty($report->review_notes)) {
+                return back()->withErrors([
+                    'business_rule' => 'BR-02: Laporan belum ditinjau oleh Relawan Pemantau. Koordinator hanya dapat meneruskan laporan yang sudah berstatus "ditinjau" dan memiliki catatan tinjauan.',
+                ]);
+            }
+
+            $report->update([
+                'status' => 'diteruskan',
+                'forwarded_to' => $validated['forwarded_to'],
+                'forwarded_at' => now(),
+            ]);
+
+            return redirect()->route('reports.show', $report)
+                ->with('success', 'Laporan berhasil dicatat telah diteruskan kepada ' . $validated['forwarded_to'] . '.');
+        }
+
+        // Alur Status menuju 'selesai': Hanya laporan yang sudah 'diteruskan' atau 'ditinjau' yang boleh ditutup/selesai
+        if ($validated['status'] === 'selesai') {
+            if (! in_array($report->status, ['ditinjau', 'diteruskan'], true)) {
+                return back()->withErrors([
+                    'business_rule' => 'Alur Status: Laporan yang masih menunggu tinjauan tidak dapat langsung ditandai selesai.',
+                ]);
+            }
+
+            $report->update([
+                'status' => 'selesai',
+            ]);
+
+            return redirect()->route('reports.show', $report)
+                ->with('success', 'Proses pemantauan laporan pada aplikasi komunitas dinyatakan selesai.');
+        }
+
+        return back();
+    }
+
 }

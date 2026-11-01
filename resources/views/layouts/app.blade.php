@@ -40,7 +40,7 @@
                 @if(auth()->user()->role === 'pelapor')
                     <a href="{{ route('reports.create') }}">+ Buat Laporan</a>
                 @endif
-                @if(in_array(auth()->user()->role, ['relawan', 'koordinator']))
+                @if(in_array(auth()->user()->role, ['relawan', 'koordinator']) && Route::has('reports.recap'))
                     <a href="{{ route('reports.recap') }}">Rekap Laporan</a>
                 @endif
             @endauth
