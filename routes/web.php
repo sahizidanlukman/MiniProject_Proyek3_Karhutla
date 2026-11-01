@@ -4,7 +4,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FireReportController;
 use Illuminate\Support\Facades\Route;
 
-// Akses utama diarahkan ke daftar laporan
 Route::get('/', function () {
     return redirect()->route('reports.index');
 });
@@ -24,4 +23,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/create', [FireReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [FireReportController::class, 'store'])->name('reports.store');
     Route::get('/reports/{report}', [FireReportController::class, 'show'])->name('reports.show');
+
+    // Rute Edit & Update khusus Pelapor
+    Route::get('/reports/{report}/edit', [FireReportController::class, 'edit'])->name('reports.edit');
+    Route::put('/reports/{report}', [FireReportController::class, 'update'])->name('reports.update');
 });

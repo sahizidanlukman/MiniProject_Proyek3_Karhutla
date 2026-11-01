@@ -20,5 +20,16 @@ class DatabaseSeeder extends Seeder
                 'role' => 'pelapor',
             ]
         );
+
+        // 2. Data Master Area / Wilayah untuk Dropdown
+        Area::firstOrCreate(
+            ['name' => 'Kawasan Perkebunan Gambut Blok Timur'],
+            [
+                'district' => 'Kec. Rasau Jaya, Kab. Kubu Raya',
+                'risk_level' => 'tinggi',
+                'contact_agency' => 'BPBD Kubu Raya & Manggala Agni Daops Pontianak',
+                'description' => 'Lahan gambut dalam di sekitar perkebunan warga.',
+            ]
+        );
     }
 }
