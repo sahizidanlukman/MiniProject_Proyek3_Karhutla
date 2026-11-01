@@ -29,6 +29,10 @@
         }
         .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+                .pagination { display: flex; gap: 6px; list-style: none; padding: 0; margin: 12px 0 0; }
+        .pagination .page-link { display: inline-block; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; color: #1e293b; background: #fff; }
+        .pagination .active .page-link { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+        .pagination .disabled .page-link { color: #94a3b8; }
     </style>
 </head>
 <body>

@@ -78,7 +78,7 @@
 </div>
 
 <!-- Panel Aksi untuk Relawan Pemantau (dan Koordinator) selama status belum final (BR-03) -->
-@if(in_array(auth()->user()->role, ['relawan', 'koordinator']) && !in_array($report->status, ['selesai', 'ditolak']))
+@if(auth()->user()->role === 'relawan' && !in_array($report->status, ['selesai', 'ditolak']))
 <div class="card">
     <h3 style="margin-top:0;">Form Peninjauan Relawan Pemantau</h3>
     <form action="{{ route('reports.review', $report) }}" method="POST">
@@ -110,12 +110,12 @@
 </div>
 @endif
 
-<!-- Panel Aksi Khusus Koordinator Relawan selama status belum final (BR-02 & BR-03) -->
+<!-- Panel Aksi Khusus Koordinator Relawan selama status belum final -->
 @if(auth()->user()->role === 'koordinator' && !in_array($report->status, ['selesai', 'ditolak']))
 <div class="card">
     <h3 style="margin-top:0;">Form Koordinasi & Penerusan Pihak Terkait (Khusus Koordinator)</h3>
     <p style="font-size:13px; color:#475569;">
-        Catatan <strong>BR-02</strong>: Laporan hanya dapat diteruskan jika sudah berstatus <strong>ditinjau</strong> oleh Relawan Pemantau dan memiliki catatan tinjauan.
+        Catatan: Laporan hanya dapat diteruskan jika sudah berstatus <strong>ditinjau</strong> oleh Relawan Pemantau dan memiliki catatan tinjauan.
     </p>
 
     <form action="{{ route('reports.coordinate', $report) }}" method="POST">

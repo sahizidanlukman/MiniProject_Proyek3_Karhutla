@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
 
     // Aksi Peninjauan oleh Relawan Pemantau atau Koordinator 
     Route::patch('/reports/{report}/review', [FireReportController::class, 'review'])
-        ->middleware('role:relawan,koordinator')
+        ->middleware('role:relawan')
         ->name('reports.review');
 
     // Aksi Penerusan & Penyelesaian khusus Koordinator Relawan 

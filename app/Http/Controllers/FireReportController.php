@@ -10,14 +10,33 @@ use Illuminate\Support\Facades\Storage;
 
 class FireReportController extends Controller
 {
-    public function index(Request $request)
+        public function index(Request $request)
     {
         $user = Auth::user();
         $query = FireReport::with(['area', 'reporter'])->latest();
 
-        // Pelapor hanya boleh melihat daftar laporan miliknya sendiri (AC-05)
         if ($user->role === 'pelapor') {
             $query->where('user_id', $user->id);
+        }
+
+        if ($request->filled('search')) {
+            $keyword = $request->input('search');
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                  ->orWhere('description', 'like', "%{$keyword}%");
+            });
+        }
+
+        if ($request->filled('area_id')) {
+            $query->where('area_id', $request->input('area_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('severity')) {
+            $query->where('severity', $request->input('severity'));
         }
 
         $reports = $query->paginate(5)->withQueryString();
@@ -188,11 +207,11 @@ class FireReportController extends Controller
             ->with('success', 'Hasil peninjauan laporan berhasil disimpan.');
     }
     /**
-     * Pencatatan penerusan informasi & penyelesaian oleh Koordinator Relawan (AC-06, AC-07, BR-02, BR-03).
+     * Pencatatan penerusan informasi & penyelesaian oleh Koordinator Relawan .
      */
     public function coordinate(Request $request, FireReport $report)
     {
-        // BR-03: Laporan yang sudah selesai atau ditolak tidak dapat diubah lagi
+        // Laporan yang sudah selesai atau ditolak tidak dapat diubah lagi
         if (in_array($report->status, ['selesai', 'ditolak'], true)) {
             return back()->withErrors([
                 'business_rule' => 'BR-03: Laporan sudah berstatus final (' . $report->status . ') dan tidak dapat diubah lagi.',
@@ -204,11 +223,11 @@ class FireReportController extends Controller
             'forwarded_to' => ['required_if:status,diteruskan', 'nullable', 'string', 'max:150'],
         ]);
 
-        // BR-02: Laporan hanya dapat diteruskan ke pihak terkait jika sudah ditinjau oleh Relawan Pemantau
+        // Laporan hanya dapat diteruskan ke pihak terkait jika sudah ditinjau oleh Relawan Pemantau
         if ($validated['status'] === 'diteruskan') {
             if ($report->status !== 'ditinjau' || empty($report->review_notes)) {
                 return back()->withErrors([
-                    'business_rule' => 'BR-02: Laporan belum ditinjau oleh Relawan Pemantau. Koordinator hanya dapat meneruskan laporan yang sudah berstatus "ditinjau" dan memiliki catatan tinjauan.',
+                    'business_rule' => 'Laporan belum ditinjau oleh Relawan Pemantau. Koordinator hanya dapat meneruskan laporan yang sudah berstatus "ditinjau" dan memiliki catatan tinjauan.',
                 ]);
             }
 
